@@ -1,6 +1,69 @@
 import java.util.Arrays;
 
 public class AES {
+
+    public static byte[] encryptECB(byte[] data, byte[] key) {
+        byte[] extendedData = Arrays.copyOf(data, (data.length+15)/16*16);
+        byte[] result = new byte[extendedData.length];
+        for (int i = 0; i < extendedData.length/16; i++) {
+            byte[] block = Arrays.copyOfRange(extendedData, i*16, (i+1)*16);
+            byte[] enc = encrypt(block, key);
+            for (int j = 0; j < enc.length; j++) {
+                result[i*16 + j] = enc[j];
+            }
+        }
+        return result;
+    }
+
+    public static byte[] decryptECB(byte[] data, byte[] key) {
+        byte[] result = new byte[data.length];
+        for (int i = 0; i < data.length/16; i++) {
+            byte[] block = Arrays.copyOfRange(data, i*16, (i+1)*16);
+            byte[] dec = decrypt(block, key);
+            for (int j = 0; j < dec.length; j++) {
+                result[i*16 + j] = dec[j];
+            }
+        }
+        return result;
+    }
+
+    public static byte[] xor(byte[] set1, byte[] set2) {
+        byte[] result = new byte[set1.length];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (byte)(set1[i] ^ set2[i]);
+        }
+        return result;
+    }
+
+    public static byte[] encryptCBC(byte[] data, byte[] key, byte[] iv) {
+        byte[] extendedData = Arrays.copyOf(data, (data.length+15)/16*16);
+        byte[] result = new byte[extendedData.length];
+        for (int i = 0; i < extendedData.length/16; i++) {
+            byte[] dec = Arrays.copyOfRange(extendedData, i*16, (i+1)*16);
+            dec = xor(dec, iv);
+            byte[] enc = encrypt(dec, key);
+            for (int j = 0; j < enc.length; j++) {
+                result[i*16 + j] = enc[j];
+            }
+            iv = enc;
+        }
+        return result;
+    }
+
+    public static byte[] decryptCBC(byte[] data, byte[] key, byte[] iv) {
+        byte[] result = new byte[data.length];
+        for (int i = 0; i < data.length/16; i++) {
+            byte[] enc = Arrays.copyOfRange(data, i*16, (i+1)*16);
+            byte[] dec = decrypt(enc, key);
+            dec = xor(dec, iv);
+            for (int j = 0; j < dec.length; j++) {
+                result[i*16 + j] = dec[j];
+            }
+            iv = enc;
+        }
+        return result;
+    }
+
     public static byte[] encrypt(byte[] data, byte[] key) {
         byte[] expandedKey = schedule(key);
 
