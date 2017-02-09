@@ -193,4 +193,22 @@ public class Set1 {
         return finalKey;
     }
 
+    // Challenge 8
+    // line 132 is encoded in AES ECB
+    public static int countDupes(String hex) {
+        int max = 0;
+        for (int i = 0; i < hex.length()/32; i++) {
+            String substr = hex.substring(i*32, (i+1)*32);
+            int c = 0;
+            for (int j = 0; j < hex.length()/32; j++) {
+                if (substr.equalsIgnoreCase(hex.substring(j*32, (j+1)*32))) {
+                    c++;
+                }
+            }
+            if (c > max) {
+                max = c;
+            }
+        }
+        return max;
+    }
 }
