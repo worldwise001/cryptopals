@@ -1,4 +1,6 @@
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class Set2 {
@@ -21,10 +23,14 @@ public class Set2 {
     public static byte[] randomKey() {
         byte[] key = new byte[16];
         rand.nextBytes(key);
+        for (int i = 0; i < key.length; i++) {
+            System.out.printf("%02x, ", key[i]);
+        }
+        System.out.println();
         return key;
     }
 
-    public static byte[] encryptionOracle(byte[] input) {
+    public static byte[] encryptionOracle11(byte[] input) {
         int start = rand.nextInt(5) + 5;
         int end = rand.nextInt(5) + 5;
         byte[] key = randomKey();
@@ -57,5 +63,36 @@ public class Set2 {
         } else {
             System.out.println("CBC");
         }
+    }
+
+    // Challenge 12
+    private static byte[] key12 = new byte[]{0x59, 0x24, 0x35, (byte)0xe3, (byte)0x83, (byte)0xa1, (byte)0xe0, (byte)0xe5, (byte)0xe3, 0x7d, (byte)0xaf, 0x52, (byte)0xb1, 0x77, 0x5e, 0x77};
+    public static byte[] encryptionOracle12(byte[] input) {
+        byte[] key = key12;
+        return AES.encryptECB(input, key);
+    }
+
+    public static String attemptDecryptECB(String mystery) {
+        String decrypted = "";
+        String start = "aaaaaaaaaaaaaaa";
+        mystery += "aaaaaaaaaaaaaaaa";
+        while (mystery.length() > 16)
+        {
+            String input = start + mystery;
+            byte[] enc = encryptionOracle12(input.getBytes());
+            byte[] encsh = Arrays.copyOf(enc, 16);
+            for (int i = 0; i < 256; i++) {
+                input = start + (char)i + mystery;
+                byte[] p = encryptionOracle12(input.getBytes());
+                byte[] psh = Arrays.copyOf(p, 16);
+                if (Arrays.equals(encsh, psh)) {
+                    decrypted += (char)i;
+                    start = start.substring(1) + (char)i;
+                    mystery = mystery.substring(1);
+                    break;
+                }
+            }
+        }
+        return decrypted;
     }
 }

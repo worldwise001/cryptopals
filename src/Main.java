@@ -1,18 +1,17 @@
-import java.util.Random;
+import java.util.Base64;
 
 public class Main {
-    private static final Random rand = new Random();
+
+    private static final String TEXT =
+            "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkg" +
+            "aGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBq" +
+            "dXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUg" +
+            "YnkK";
+
     public static void main(String[] args) {
-        for (int tries = 0; tries < 10; tries++) {
-            String randomText = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-            /*
-            int length = rand.nextInt(256) + 128;
-            for (int i = 0; i < length; i++) {
-                randomText += String.format("%c", (rand.nextInt(26) + 'a'));
-            }*/
-            System.out.println(randomText);
-            byte[] enc = Set2.encryptionOracle(randomText.getBytes());
-            Set2.detectEncryption(enc);
-        }
+        String text = new String(Base64.getDecoder().decode(TEXT));
+        String dec = Set2.attemptDecryptECB(text);
+        System.out.println(dec);
+        System.out.println(text.equalsIgnoreCase(dec));
     }
 }
